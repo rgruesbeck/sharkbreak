@@ -1,0 +1,19 @@
+{
+  "name": "Shark Break",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "npm run koji; parcel index.html",
+    "build": "npm run koji; parcel build index.html",
+    "koji": "node prebuild.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "parcel-bundler": "^1.12.3"
+  }
+}
