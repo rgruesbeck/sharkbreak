@@ -1,0 +1,24 @@
+{
+  "general": {
+    "name": "Breakout",
+    "buttonText": "Start"
+  },
+  "@@editor": [
+    {
+      "key": "general",
+      "name": "Game settings",
+      "icon": "🎮",
+      "source": "general.json",
+      "fields": [
+        {
+          "key": "name",
+          "name": "App name"
+        },
+        {
+          "key": "buttonText",
+          "name": "Start Button Text"
+        }
+      ]
+    }
+  ]
+}

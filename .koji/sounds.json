@@ -1,0 +1,21 @@
+{
+  "sounds": {
+    "backgroundMusic": "https://audio.cdn.gometa.io/eeb2d24d-9da7-432d-843a-8d2ab34d89a9-out.mp3"
+  },
+  "@@editor": [
+    {
+      "key": "sounds",
+      "name": "Sounds",
+      "icon": "🔊️",
+      "source": "sounds.json",
+      "fields": [
+        {
+          "key": "backgroundMusic",
+          "name": "Background Music",
+          "description": "URL of audio file to loop in background",
+          "type": "sound"
+        }
+      ]
+    }
+  ]
+}

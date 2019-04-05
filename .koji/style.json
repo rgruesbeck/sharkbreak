@@ -1,0 +1,46 @@
+{
+  "style": {
+    "textColor": "#c36cff",
+    "primaryColor": "#37bed1",
+    "backgroundColor": "#41557f",
+    "backgroundGradient": "#F1F3F7",
+    "fontFamily": "https://fonts.googleapis.com/css?family=Pacifico"
+  },
+  "@@editor": [
+    {
+      "key": "style",
+      "name": "Colors",
+      "icon": "💅",
+      "source": "style.json",
+      "fields": [
+        {
+            "key": "textColor",
+            "name": "Text color",
+            "description": "Default color for text",
+            "type": "color"
+        },
+        {
+            "key": "primaryColor",
+            "name": "Primary Color",
+            "description": "Backup Color for theming",
+            "type": "color"
+        },
+        {
+            "key": "backgroundColor",
+            "name": "Background color",
+            "type": "color"
+        },
+        {
+            "key": "backgroundGradient",
+            "name": "Default gradient to in background",
+            "type": "color"
+        },
+        {
+          "key": "fontFamily",
+          "name": "Font Family",
+          "description": "Google fonts link to font to use on page"
+        }
+      ]
+    }
+  ]
+}

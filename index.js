@@ -9,7 +9,7 @@ var x = canvas.width/2;
 var y = canvas.height-30;
 var dx = 2;
 var dy = -2;
-var speed = 3;
+var speed = 1;
 var paddleHeight = 60;
 var paddleWidth = 80;
 var paddleX = (canvas.width-paddleWidth)/2;
@@ -28,18 +28,6 @@ var score = 0;
 var lives = 3;
 
 var font = 'Arial';
-var textColor = 'red';
-// background color
-// font color
-// font face
-// ball image
-// bricks image
-// background image
-
-// edit general
-// edit audio
-// edit audio
-
 
 var bricks = [];
 for(var c=0; c<brickColumnCount; c++) {
@@ -49,6 +37,8 @@ for(var c=0; c<brickColumnCount; c++) {
   }
 }
 
+console.log(config);
+
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -57,13 +47,13 @@ document.addEventListener("message", injectHandler, false);
 function load() {
 
   // load images
-  loadImage('backgroundImage', config.general.backgroundImage);
-  loadImage('ballImage', config.general.ballImage);
-  loadImage('paddleImage', config.general.paddleImage);
-  loadImage('brickImage', config.general.brickImage);
+  loadImage('backgroundImage', config.images.backgroundImage);
+  loadImage('ballImage', config.images.ballImage);
+  loadImage('paddleImage', config.images.paddleImage);
+  loadImage('brickImage', config.images.brickImage);
 
   // load font
-  loadFont(config.general.fontFamily);
+  loadFont(config.style.fontFamily);
 }
 
 function start() {
@@ -241,7 +231,7 @@ function drawBricks() {
 }
 function drawScore() {
   ctx.font = "24px " + font;
-  ctx.fillStyle = config.general.textColor;
+  ctx.fillStyle = config.style.textColor;
   ctx.fillText("Score: "+score, 8, 20);
 }
 function drawLives() {
@@ -249,13 +239,13 @@ function drawLives() {
   var text = ctx.measureText(message);
 
   ctx.font = "24px " + font;
-  ctx.fillStyle = config.general.textColor;
+  ctx.fillStyle = config.style.textColor;
   ctx.fillText(message, canvas.width-text.width, 20);
 }
 
 function drawMessage(message) {
   ctx.font = "46px " + font; 
-  ctx.fillStyle = config.general.textColor;
+  ctx.fillStyle = config.style.textColor;
 
   var text = ctx.measureText(message);
   ctx.fillText(message, (canvas.width/2)-(text.width/2), canvas.height/2);

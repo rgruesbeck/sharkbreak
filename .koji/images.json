@@ -1,0 +1,45 @@
+{
+  "images": {
+    "backgroundImage": "https://66.media.tumblr.com/4982b6d5291aa36d0c3d08e0779c2c45/tumblr_o9o3teBYqf1s0dk2do2_400.png",
+    "ballImage": "http://www.pngpix.com/wp-content/uploads/2016/07/PNGPIX-COM-Beach-Ball-PNG-Transparent-Image-2.png",
+    "paddleImage": "https://s3.amazonaws.com/images.shaperbuddy.com/65/surfboards/29239055958ae2_362.png",
+    "brickImage": "http://pluspng.com/img-png/shark-png-shark-png-clipart-958.png"
+  },
+  "@@editor": [
+    {
+      "key": "images",
+      "name": "Images",
+      "icon": "🐳️️",
+      "source": "images.json",
+      "fields": [
+        {
+          "key": "backgroundImage",
+          "name": "Background Image",
+          "description": "URL of Image to place as background",
+          "type": "image",
+          "typeOptions": {
+            "fit": "cover"
+          }
+        },
+        {
+          "key": "ballImage",
+          "name": "Ball Image",
+          "description": "URL of Image to use as the ball",
+          "type": "image"
+        },
+        {
+          "key": "paddleImage",
+          "name": "Paddle Image",
+          "description": "URL of Image to use as the paddle",
+          "type": "image"
+        },
+        {
+          "key": "brickImage",
+          "name": "Brick Image",
+          "description": "URL of Image to use as a brick",
+          "type": "image"
+        }
+      ]
+    }
+  ]
+}

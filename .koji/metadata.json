@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "title": "Shark Break",
+    "description": "An easily extendable shark game. Customize it to be whatever you want with Koji.",
+    "image": "",
+    "icon": "",
+    "gaCode": ""
+  },
+  "@@editor": [
+    {
+      "key": "metadata",
+      "name": "Metadata",
+      "icon": "⚙",
+      "source": "metadata.json",
+      "fields": [
+        {
+          "key": "title",
+          "name": "Name for your App",
+          "description": "Will show up as title on Google and Facebook"
+        },
+        {
+          "key": "description",
+          "name": "Description",
+          "description": "Description of your app for Google and Facebook",
+          "type": "textarea"
+        },
+        {
+          "key": "gaCode",
+          "name": "GA Tracking ID",
+          "description": "Tracking ID for Google Analytics",
+          "type": "text",
+          "typeOptions": {
+              "monospace": true
+          }
+        },
+        {
+          "key": "image",
+          "name": "Share Image",
+          "type": "image",
+          "description": "Embedded Image to load when your App is shared"
+        },
+        {
+          "key": "icon",
+          "name": "Icon",
+          "type": "image",
+          "description": "Small Icon for your App"
+        }
+      ]
+    }
+  ]
+}
