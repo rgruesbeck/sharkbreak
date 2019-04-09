@@ -1,5 +1,4 @@
 node_modules
-.koji
 dist
 .cache
 manifest.json

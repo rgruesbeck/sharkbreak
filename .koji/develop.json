@@ -2,14 +2,13 @@
   "develop": {
     "frontend": {
       "path": "frontend",
-      "port": 8080,
+      "port": 1234,
       "events": {
-        "started": "[webpack] Frontend server started",
-        "building": "[webpack] Frontend building",
-        "built": "##frontend-built##",
-        "build-error": "[webpack] Frontend build error",
-        "loaded": "[koji] Frontend loaded"
-      },
+        "started": "npm start",
+        "building": "node config.js",
+        "built": "Built in",
+        "build-error": "npm ERR!"
+       },
       "startCommand": "npm start"
     }
   }
