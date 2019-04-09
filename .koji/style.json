@@ -3,7 +3,6 @@
     "textColor": "#c36cff",
     "primaryColor": "#37bed1",
     "backgroundColor": "#41557f",
-    "backgroundGradient": "#F1F3F7",
     "fontFamily": "https://fonts.googleapis.com/css?family=Pacifico"
   },
   "@@editor": [
@@ -28,11 +27,6 @@
         {
             "key": "backgroundColor",
             "name": "Background color",
-            "type": "color"
-        },
-        {
-            "key": "backgroundGradient",
-            "name": "Default gradient to in background",
             "type": "color"
         },
         {

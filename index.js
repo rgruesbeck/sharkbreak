@@ -1,8 +1,5 @@
 // Shark Break
-var config = {};
-var updates = {};
-var koji = require('./config.json');
-config = {...koji, ...updates};
+var config = require('./config.json');
 
 import { requestAnimationFrame, cancelAnimationFrame } from './helpers/animationframe.js';
 import { loadImage, loadSound, loadFont } from './helpers/loaders.js';
@@ -60,9 +57,6 @@ document.addEventListener("touchmove", touchMoveHandler, false);
 window.addEventListener("message", injectHandler, false);
 
 function load() {
-  // update config
-  config = {...koji, ...updates};
-
   // load assets
   Promise.all([
     loadImage('backgroundImage', config.images.backgroundImage),
@@ -383,8 +377,6 @@ load();
 
 // koji injection handler
 function injectHandler({ data }) {
-  // New user config
-
   if (data.action === 'injectGlobal') {
     let { scope, key, value } = data.payload;
     if (!updates.hasOwnProperty(scope)) { updates[scope] = {}; }
