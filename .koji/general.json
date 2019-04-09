@@ -1,7 +1,9 @@
 {
   "general": {
     "name": "Breakout",
-    "buttonText": "Start"
+    "buttonText": "Start",
+    "ballSpeed": "3",
+    "lives": "3"
   },
   "@@editor": [
     {
@@ -17,6 +19,14 @@
         {
           "key": "buttonText",
           "name": "Start Button Text"
+        },
+        {
+          "key": "ballSpeed",
+          "name": "Ball Speed"
+        },
+        {
+          "key": "lives",
+          "name": "Lives"
         }
       ]
     }

@@ -1,6 +1,10 @@
 {
   "sounds": {
-    "backgroundMusic": "https://audio.cdn.gometa.io/eeb2d24d-9da7-432d-843a-8d2ab34d89a9-out.mp3"
+    "backgroundMusic": "https://objects.koji-cdn.com/d659a1cd-54ca-41c1-906f-3b7b5f6aeb7d/backgroundMusic2.mp3",
+    "winSound": "https://objects.koji-cdn.com/d659a1cd-54ca-41c1-906f-3b7b5f6aeb7d/winSound.mp3",
+    "gameoverSound": "https://objects.koji-cdn.com/d659a1cd-54ca-41c1-906f-3b7b5f6aeb7d/gameoverSound.mp3",
+    "scoreSound": "https://objects.koji-cdn.com/d659a1cd-54ca-41c1-906f-3b7b5f6aeb7d/scoreSound.mp3",
+    "dieSound": "https://objects.koji-cdn.com/d659a1cd-54ca-41c1-906f-3b7b5f6aeb7d/dieSound.mp3"
   },
   "@@editor": [
     {
@@ -13,6 +17,30 @@
           "key": "backgroundMusic",
           "name": "Background Music",
           "description": "URL of audio file to loop in background",
+          "type": "sound"
+        },
+        {
+          "key": "winSound",
+          "name": "Win Sound",
+          "description": "URL of audio file to play when you win",
+          "type": "sound"
+        },
+        {
+          "key": "gameoverSound",
+          "name": "Game Over Sound",
+          "description": "URL of audio file to play when game over",
+          "type": "sound"
+        },
+        {
+          "key": "scoreSound",
+          "name": "Score Sound",
+          "description": "URL of audio file to play when player scores a point",
+          "type": "sound"
+        },
+        {
+          "key": "dieSound",
+          "name": "Die Sound",
+          "description": "URL of audio file to play when when player looses a life",
           "type": "sound"
         }
       ]
