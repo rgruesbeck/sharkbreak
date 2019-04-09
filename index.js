@@ -34,7 +34,7 @@ var brickPadding = 10;
 var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
 var brickRowCount = Math.floor(canvas.width / (brickWidth + brickPadding + brickOffsetLeft));
-var brickColumnCount = 3;
+var brickColumnCount = config.general.rows;
 var frameId = 0;
 var gameState = 'waiting';
 var score = 0;
@@ -94,7 +94,6 @@ function load() {
 function reset() {
   document.location.reload();
 }
-
 
 function wait() {
   if (frameId > 0) {

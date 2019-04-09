@@ -3,7 +3,8 @@
     "name": "Breakout",
     "buttonText": "Start",
     "ballSpeed": "3",
-    "lives": "3"
+    "lives": "3",
+    "rows": "4"
   },
   "@@editor": [
     {
@@ -27,6 +28,10 @@
         {
           "key": "lives",
           "name": "Lives"
+        },
+        {
+          "key": "rows",
+          "name": "Rows of Sharks"
         }
       ]
     }
