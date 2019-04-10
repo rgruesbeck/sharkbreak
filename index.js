@@ -378,8 +378,7 @@ load();
 function injectHandler({ data }) {
   if (data.action === 'injectGlobal') {
     let { scope, key, value } = data.payload;
-    if (!updates.hasOwnProperty(scope)) { updates[scope] = {}; }
-    updates[scope][key] = value;
+    config[scope][key] = value;
     load();
   }
 }
