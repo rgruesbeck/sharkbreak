@@ -24,7 +24,7 @@ module.exports = () => {
   };
 
   readDirectory('.')
-    .filter(path => (path.endsWith('.json') && path.includes('.koji')) && !path.includes('.koji-resources') && !path.includes('#'))
+    .filter(path => (path.endsWith('.json') && path.includes('.koji')) && !path.includes('.koji-resources'))
     .forEach((path) => {
       try {
         const file = JSON.parse(fs.readFileSync(path, 'utf8'));
@@ -52,6 +52,7 @@ module.exports = () => {
         }
       } catch (err) {
         //
+        console.log(`ERR! building ${path}`, err);
       }
     });
 

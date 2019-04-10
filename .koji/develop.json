@@ -1,7 +1,7 @@
 {
   "develop": {
     "frontend": {
-      "path": "frontend",
+      "path": ".",
       "port": 1234,
       "events": {
         "started": "npm start",
