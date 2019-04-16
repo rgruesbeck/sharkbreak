@@ -1,12 +1,11 @@
 {
   "deploy": {
-    "subdomain": "sharky.withkoji.com",
+    "subdomain": "brickbreaker.withkoji.com",
     "frontend": {
-      "output": "frontend/build",
+      "output": "dist",
       "commands": [
-        "cd frontend",
         "npm install",
-        "export NODE_ENV=production && npm run compile"
+        "npm run build"
       ]
     }
   }
