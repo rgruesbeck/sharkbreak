@@ -4,3 +4,5 @@ dist
 manifest.json
 config.json
 tmp
+.remy
+Dockerfile

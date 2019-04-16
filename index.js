@@ -23,7 +23,7 @@ var fonts = {};
 
 var gameMuted = false;
 
-var ballRadius = 5 * gameScale;
+var ballRadius = 3 * gameScale;
 var ballSpin = 0.2;
 var x = canvas.width / 2;
 var y = canvas.height - 30;
@@ -359,6 +359,7 @@ function injectHandler({ data }) {
   if (data.action === 'injectGlobal') {
     let { scope, key, value } = data.payload;
     config[scope][key] = value;
+    sounds.backgroundMusic.pause();
     load();
   }
 }
