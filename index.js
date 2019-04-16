@@ -15,11 +15,7 @@ var overlay = new Overlay(overlayNode);
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-console.log(window.innerWidth, window.innerHeight, canvas.width, canvas.height);
-
 var gameScale = ((canvas.width + canvas.height) / 270);
-
-console.log(config);
 
 var images = {};
 var sounds = {};
@@ -38,6 +34,7 @@ var speed = 3;
 var paddleHeight = 10 * gameScale;
 var paddleWidth = 30 * gameScale;
 var paddleX = (canvas.width - paddleWidth) / 2;
+var paddleXprev = 0;
 var paddleDx = 0.018 * canvas.width;
 var rightPressed = false;
 var leftPressed = false;
@@ -140,8 +137,8 @@ function wait() {
 function restart() {
   x = paddleX;
   y = canvas.height - paddleHeight - ballRadius - 30;
-  dx = -dx
-  dy = -dy;
+  dx = 0.005 * canvas.width;
+  dy = -0.005 * canvas.height;
 }
 
 function clickHandler(e) {
@@ -184,6 +181,7 @@ function keyUpHandler(e) {
 function mouseMoveHandler(e) {
   var relativeX = e.clientX - canvas.offsetLeft;
   if (relativeX > 0 && relativeX < canvas.width) {
+    paddleXprev = paddleX;
     paddleX = relativeX - paddleWidth / 2;
   }
 }
@@ -191,6 +189,7 @@ function mouseMoveHandler(e) {
 function touchMoveHandler(e) {
   var relativeX = e.touches[0].clientX - canvas.offsetLeft;
   if (relativeX > 0 && relativeX < canvas.width) {
+    paddleXprev = paddleX;
     paddleX = relativeX - paddleWidth / 2;
   }
 }
@@ -210,10 +209,12 @@ function checkWallCollisions() {
 function checkPaddleCollisions() {
   let cx = x + ballRadius;
   let cy = y + ballRadius;
+  let pv = (paddleX - paddleXprev)/10;
 
   // check for paddle
   if (cy + dy >= canvas.height - paddleHeight) {
     if (cx > paddleX && cx < paddleX + paddleWidth) {
+      dx = dx + pv;
       dy = -dy;
     }
   }
@@ -244,7 +245,7 @@ function checkBrickCollisions() {
           b.status = 0;
           speed += 0.005;
           score++;
-          playSound(sounds.scoreSound, false);
+          playSound(sounds.scoreSound, gameMuted);
           if (score == brickRowCount * brickColumnCount) {
             gameState = 'win';
           }
@@ -291,9 +292,11 @@ function draw() {
 
   // move paddle
   if (rightPressed && paddleX < canvas.width - paddleWidth) {
+    paddleXprev = paddleX;
     paddleX += paddleDx;
   }
   else if (leftPressed && paddleX > 0) {
+    paddleXprev = paddleX;
     paddleX -= paddleDx;
   }
 
@@ -309,7 +312,6 @@ function draw() {
   overlay.setScore(score);
   overlay.setLives(lives);
 
-  console.log(gameState);
   if (gameState === 'play') {
     overlay.hideBanner();
     overlay.hideButton();
@@ -344,8 +346,11 @@ function playSound(sound, muted) {
   if (!sound) { return; }
 
   sound.currentTime = 0;
-  if (!muted) { return sound.play() }
-  sound.pause();
+  if (!muted) { 
+    sound.play();
+  } else {
+    sound.pause();
+  }
 }
 
 
