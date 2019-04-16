@@ -359,6 +359,8 @@ function resizeHandler() {
 function injectHandler({ data }) {
   if (data.action === 'injectGlobal') {
     let { scope, key, value } = data.payload;
+    if (key === 'ballSpeed') { value = parseInt(value); }
+
     config[scope][key] = value;
     sounds.backgroundMusic.pause();
     load();
