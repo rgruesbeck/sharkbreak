@@ -21,7 +21,7 @@ var images = {};
 var sounds = {};
 var fonts = {};
 
-var gameMuted = false;
+var gameMuted = true;
 
 var ballRadius = 3 * gameScale;
 var ballSpin = 0.2;
@@ -30,7 +30,7 @@ var y = canvas.height - 30;
 var r = 0;
 var dx = 0.005 * canvas.width;
 var dy = -0.005 * canvas.height;
-var speed = 3;
+var speed = parseInt(config.general.ballSpeed);
 var paddleHeight = 10 * gameScale;
 var paddleWidth = 30 * gameScale;
 var paddleX = (canvas.width - paddleWidth) / 2;
@@ -145,8 +145,6 @@ function restart() {
 function clickHandler(e) {
   const { target } = e;
 
-  console.log(target.id);
-
   if (target.id === 'button') {
     gameState = 'play';
     draw();
@@ -156,8 +154,6 @@ function clickHandler(e) {
     gameMuted = !gameMuted;
     overlay.setMute(gameMuted)
     playSound(sounds.backgroundMusic, gameMuted);
-
-    console.log(gameMuted);
   }
 }
 
@@ -244,7 +240,6 @@ function checkBrickCollisions() {
         if (cx > b.x && cx < b.x + brickWidth && cy > b.y && cy < b.y + brickHeight) {
           dy = -dy;
           b.status = 0;
-          speed += 0.005;
           score++;
           playSound(sounds.scoreSound, gameMuted);
           if (score == brickRowCount * brickColumnCount) {
@@ -343,10 +338,9 @@ function draw() {
   }
 }
 
-// play sounds
 function playSound(sound, muted) {
-  if (!sound) { return; } 
-   
+  if (!sound) { return; }
+
   sound.currentTime = 0;
   if (!muted) { 
     sound.play();
@@ -356,9 +350,10 @@ function playSound(sound, muted) {
 }
 
 // reload game on resize events
-function resizeHandler(e) {
-  document.location.reload();
+function resizeHandler() {
+    document.location.reload();
 }
+
 
 // koji injection handler
 function injectHandler({ data }) {
