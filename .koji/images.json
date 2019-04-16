@@ -1,9 +1,9 @@
 {
   "images": {
-    "backgroundImage": "https://66.media.tumblr.com/4982b6d5291aa36d0c3d08e0779c2c45/tumblr_o9o3teBYqf1s0dk2do2_400.png",
-    "ballImage": "http://www.pngpix.com/wp-content/uploads/2016/07/PNGPIX-COM-Beach-Ball-PNG-Transparent-Image-2.png",
-    "paddleImage": "https://s3.amazonaws.com/images.shaperbuddy.com/65/surfboards/29239055958ae2_362.png",
-    "brickImage": "http://pluspng.com/img-png/shark-png-shark-png-clipart-958.png"
+    "backgroundImage": "https://images.koji-cdn.com/fb75cf82-ff13-495f-8b58-8f649e213840/48ffd74a-bfbe-4617-af28-0638a42542af.jpg",
+    "ballImage": "https://images.koji-cdn.com/fb75cf82-ff13-495f-8b58-8f649e213840/450cf331-fa84-4f6d-9b30-ffe266fae7ea.png",
+    "paddleImage": "https://images.koji-cdn.com/652aab00-af52-421e-993d-1d614b6c3a99/d2734c2a-0ef9-4ece-a130-c4f048361ca6.png",
+    "brickImage": "https://images.koji-cdn.com/652aab00-af52-421e-993d-1d614b6c3a99/brick.png"
   },
   "@@editor": [
     {

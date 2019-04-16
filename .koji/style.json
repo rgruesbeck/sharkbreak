@@ -1,9 +1,9 @@
 {
   "style": {
-    "textColor": "#c36cff",
-    "primaryColor": "#37bed1",
+    "textColor": "#ffffff",
+    "primaryColor": "#c58a20",
     "backgroundColor": "#41557f",
-    "fontFamily": "https://fonts.googleapis.com/css?family=Pacifico"
+    "fontFamily": "https://fonts.googleapis.com/css?family=Space Mono"
   },
   "@@editor": [
     {
@@ -13,21 +13,21 @@
       "source": "style.json",
       "fields": [
         {
-            "key": "textColor",
-            "name": "Text color",
-            "description": "Default color for text",
-            "type": "color"
+          "key": "textColor",
+          "name": "Text color",
+          "description": "Default color for text",
+          "type": "color"
         },
         {
-            "key": "primaryColor",
-            "name": "Primary Color",
-            "description": "Backup Color for theming",
-            "type": "color"
+          "key": "primaryColor",
+          "name": "Primary Color",
+          "description": "Backup Color for theming",
+          "type": "color"
         },
         {
-            "key": "backgroundColor",
-            "name": "Background color",
-            "type": "color"
+          "key": "backgroundColor",
+          "name": "Background color",
+          "type": "color"
         },
         {
           "key": "fontFamily",

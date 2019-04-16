@@ -8,4 +8,4 @@ fs.writeFileSync('config.json', koji);
 var kojiManifest = require('./.koji/resources/scripts/manifest.js');
 var manifest = kojiManifest();
 
-fs.writeFileSync('manifest.json', manifest);
+fs.writeFileSync('manifest.webmanifest', manifest);

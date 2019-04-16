@@ -1,20 +1,33 @@
-// Shark Break
+// Brick Breaker
 var config = require('./config.json');
 
 import { requestAnimationFrame, cancelAnimationFrame } from './helpers/animationframe.js';
 import { loadImage, loadSound, loadFont } from './helpers/loaders.js';
+import Overlay from './helpers/overlay.js';
 
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
+
+var overlayNode = document.getElementById("overlay");
+var overlay = new Overlay(overlayNode);
 
 // set canvas width and height
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-var button = null;
+console.log(window.innerWidth, window.innerHeight, canvas.width, canvas.height);
+
+var gameScale = ((canvas.width + canvas.height) / 270);
+
+console.log(config);
+
 var images = {};
 var sounds = {};
-var ballRadius = 20;
+var fonts = {};
+
+var gameMuted = false;
+
+var ballRadius = 5 * gameScale;
 var ballSpin = 0.2;
 var x = canvas.width / 2;
 var y = canvas.height - 30;
@@ -22,25 +35,23 @@ var r = 0;
 var dx = 0.005 * canvas.width;
 var dy = -0.005 * canvas.height;
 var speed = 3;
-var paddleHeight = 60;
-var paddleWidth = 80;
+var paddleHeight = 10 * gameScale;
+var paddleWidth = 30 * gameScale;
 var paddleX = (canvas.width - paddleWidth) / 2;
 var paddleDx = 0.018 * canvas.width;
 var rightPressed = false;
 var leftPressed = false;
-var brickWidth = 120;
-var brickHeight = 50;
-var brickPadding = 10;
-var brickOffsetTop = 30;
-var brickOffsetLeft = 30;
+var brickWidth = 12 * gameScale;
+var brickHeight = 5 * gameScale;
+var brickPadding = 4 * gameScale;
+var brickOffsetTop = 15 * gameScale;
+var brickOffsetLeft = 2 * gameScale;
 var brickRowCount = Math.floor(canvas.width / (brickWidth + brickPadding + brickOffsetLeft));
 var brickColumnCount = config.general.rows;
 var frameId = 0;
 var gameState = 'waiting';
 var score = 0;
 var lives = config.general.lives;
-
-var font = 'Arial'; // fallback font
 
 var bricks = [];
 for (var c = 0; c < brickColumnCount; c++) {
@@ -50,6 +61,7 @@ for (var c = 0; c < brickColumnCount; c++) {
   }
 }
 
+document.addEventListener("click", clickHandler, false);
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -83,7 +95,7 @@ function load() {
 
       // set font
       if (type === 'font') {
-        font = value;
+        fonts[key] = value;
       }
     });
 
@@ -101,7 +113,7 @@ function wait() {
   }
 
   sounds.backgroundMusic.loop = true;
-  sounds.backgroundMusic.play();
+  playSound(sounds.backgroundMusic, gameMuted);
 
   x = canvas.width / 2;
   y = canvas.height - paddleHeight - ballRadius - 30;
@@ -111,9 +123,18 @@ function wait() {
   drawBricks();
   drawPaddle();
 
-  drawButton(config.general.buttonText, () => {
-    draw();
+  overlay.setStyles({
+    textColor: config.style.textColor,
+    primaryColor: config.style.primaryColor,
+    fontFamily: config.style.fontFamily
   });
+
+  overlay.setMute(gameMuted);
+  overlay.showBanner('Brick Breaker');
+  overlay.showButton('Start');
+  overlay.setScore(score);
+  overlay.setLives(lives);
+  overlay.showStats();
 }
 
 function restart() {
@@ -123,6 +144,24 @@ function restart() {
   dy = -dy;
 }
 
+function clickHandler(e) {
+  const { target } = e;
+
+  console.log(target.id);
+
+  if (target.id === 'button') {
+    gameState = 'play';
+    draw();
+  }
+
+  if (target.id === 'mute') {
+    gameMuted = !gameMuted;
+    overlay.setMute(gameMuted)
+    playSound(sounds.backgroundMusic, gameMuted);
+
+    console.log(gameMuted);
+  }
+}
 
 function keyDownHandler(e) {
   if (e.key == "Right" || e.key == "ArrowRight") {
@@ -182,7 +221,7 @@ function checkPaddleCollisions() {
   // check for splash
   if (cy + dy >= canvas.height + ballRadius) {
       lives--;
-      sounds.dieSound.play();
+      playSound(sounds.dieSound, gameMuted);
       if (!lives) {
         gameState = 'over';
       }
@@ -205,7 +244,7 @@ function checkBrickCollisions() {
           b.status = 0;
           speed += 0.005;
           score++;
-          sounds.scoreSound.play();
+          playSound(sounds.scoreSound, false);
           if (score == brickRowCount * brickColumnCount) {
             gameState = 'win';
           }
@@ -216,7 +255,6 @@ function checkBrickCollisions() {
 }
 
 function drawBackground() {
-
   ctx.drawImage(images.backgroundImage, 0, 0, canvas.width, canvas.height);
 }
 
@@ -225,13 +263,12 @@ function drawBall() {
 }
 
 function drawPaddle() {
-
   ctx.drawImage(images.paddleImage, paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
 }
 
 function drawBricks() {
   var rowWidth = brickRowCount * (brickWidth + brickOffsetLeft);
-  var rowOffset = (canvas.width - rowWidth) / 2;
+  var rowOffset = ((canvas.width - rowWidth) / 3);
   for (var c = 0; c < brickColumnCount; c++) {
     for (var r = 0; r < brickRowCount; r++) {
       if (bricks[c][r].status == 1) {
@@ -244,79 +281,6 @@ function drawBricks() {
     }
   }
 }
-function drawScore() {
-  var message = "Score: " + score;
-
-  ctx.font = "24px " + font;
-  ctx.fillStyle = config.style.textColor;
-  ctx.fillText(message, 20, 40);
-}
-function drawLives() {
-  var message = "Lives: " + lives;
-  var text = ctx.measureText(message);
-
-  ctx.font = "24px " + font;
-  ctx.fillStyle = config.style.textColor;
-  ctx.fillText(message, canvas.width - text.width - 20, 40);
-}
-
-function drawMessage(message) {
-  ctx.font = "46px " + font;
-  ctx.fillStyle = config.style.textColor;
-
-  var text = ctx.measureText(message);
-  ctx.fillText(message, (canvas.width / 2) - (text.width / 2), 150);
-}
-
-function drawButton(message, action) {
-
-  if (button) {
-    redrawButton(message);
-  }
-
-  // create
-  button = document.createElement("span");
-  var message = document.createTextNode(message);
-
-  // add message and set id
-  button.appendChild(message);
-  button.setAttribute("id", "button");
-
-  // style button
-  var buttonStyle = `
-    font-size: 26px;
-    font-weight: bold;
-    font-family: ${font};
-    cursor: pointer;
-    display: block;
-    float: right;
-    z-index: 3;
-    position: absolute;
-    left: ${(canvas.width - 180) / 2}px;
-    top: 50vh;
-    padding: 15px;
-    width: 150px;
-    text-align: center;
-    color: ${config.style.textColor};
-    border-radius: 100px;
-    background-color: ${config.style.primaryColor};
-    box-shadow: 0 1em 2em -1em;
-  `;
-  button.setAttribute('style', buttonStyle);
-
-  // attach event listener for action
-  button.addEventListener("click", () => {
-    button.remove(); // remove button
-    action(); // do action
-  }, false);
-
-  // add button to screen
-  document.body.appendChild(button);
-}
-
-function redrawButton(message) {
-  button.innerHTML = message;
-};
 
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -341,18 +305,25 @@ function draw() {
   drawBricks();
   drawBall();
   drawPaddle();
-  drawScore();
-  drawLives();
+
+  overlay.setScore(score);
+  overlay.setLives(lives);
+
+  console.log(gameState);
+  if (gameState === 'play') {
+    overlay.hideBanner();
+    overlay.hideButton();
+  }
 
   if (gameState === 'over' || gameState === 'win') {
     if (gameState === 'over') {
-      drawMessage("Game Over");
-      sounds.gameoverSound.play();
+      overlay.showBanner("Game Over");
+      playSound(sounds.gameoverSound, gameMuted);
     }
 
     if (gameState === 'win') {
-      drawMessage("You Win!");
-      sounds.winSound.play();
+      overlay.showBanner("You Win!");
+      playSound(sounds.winSound, gameMuted);
     }
 
     cancelAnimationFrame(frameId);
@@ -367,11 +338,15 @@ function draw() {
     // get new animation frame from browser
     frameId = requestAnimationFrame(draw);
   }
-
 }
 
-// load game and wait to start
-load();
+function playSound(sound, muted) {
+  if (!sound) { return; }
+
+  sound.currentTime = 0;
+  if (!muted) { return sound.play() }
+  sound.pause();
+}
 
 
 // koji injection handler
@@ -383,15 +358,5 @@ function injectHandler({ data }) {
   }
 }
 
-// parcel hot module
-if (module.hot) {
-  module.hot.dispose(function() {
-    // module is about to be replaced
-  });
-
-  module.hot.accept(function() {
-    // module or one of its dependencies was just updated
-    reset();
-    load();
-  });
-}
+// load game and wait to start
+load();

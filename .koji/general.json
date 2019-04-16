@@ -1,6 +1,6 @@
 {
   "general": {
-    "name": "Breakout",
+    "name": "Brick Breaker",
     "buttonText": "Start",
     "ballSpeed": "3",
     "lives": "3",
