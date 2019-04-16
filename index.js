@@ -63,6 +63,7 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
 document.addEventListener("touchmove", touchMoveHandler, false);
+window.addEventListener("resize", resizeHandler, false);
 window.addEventListener("message", injectHandler, false);
 
 function load() {
@@ -342,9 +343,10 @@ function draw() {
   }
 }
 
+// play sounds
 function playSound(sound, muted) {
-  if (!sound) { return; }
-
+  if (!sound) { return; } 
+   
   sound.currentTime = 0;
   if (!muted) { 
     sound.play();
@@ -353,6 +355,10 @@ function playSound(sound, muted) {
   }
 }
 
+// reload game on resize events
+function resizeHandler(e) {
+  document.location.reload();
+}
 
 // koji injection handler
 function injectHandler({ data }) {
