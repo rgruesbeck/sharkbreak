@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "title": "Shark Break",
-    "description": "An easily extendable shark game. Customize it to be whatever you want with Koji.",
-    "image": "",
-    "icon": "",
+    "title": "Brick Breaker",
+    "description": "A customizable brick breaker game.",
+    "image": "https://i.imgur.com/ifqjjU0.png",
+    "icon": "https://i.imgur.com/ifqjjU0.png",
     "gaCode": ""
   },
   "@@editor": [
