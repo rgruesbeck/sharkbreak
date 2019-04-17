@@ -13,7 +13,7 @@ var overlay = new Overlay(overlayNode);
 
 // set canvas width and height
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.height = (typeof window.orientation !== "undefined") ? window.innerHeight - 44 : window.innerHeight; // mobile top bar hack for now
 
 var gameScale = ((canvas.width + canvas.height) / 270);
 

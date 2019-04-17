@@ -51,6 +51,7 @@ const loadSound = function(key, url) {
         value: sound
       });
     }
+    sound.load();
   });
 }
 
