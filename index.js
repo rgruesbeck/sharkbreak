@@ -13,15 +13,15 @@ var overlay = new Overlay(overlayNode);
 
 // set canvas width and height
 canvas.width = window.innerWidth;
-canvas.height = (typeof window.orientation !== "undefined") ? window.innerHeight - 44 : window.innerHeight; // mobile top bar hack for now
+canvas.height = window.innerHeight;
+//canvas.height = (typeof window.orientation !== "undefined") ? window.innerHeight - 44 : window.innerHeight; // mobile top bar hack for now
 
 var gameScale = ((canvas.width + canvas.height) / 270);
 
 var images = {};
 var sounds = {};
 var fonts = {};
-
-var gameMuted = true;
+var muted = true;
 
 var ballRadius = 3 * gameScale;
 var ballSpin = 0.2;
@@ -67,6 +67,7 @@ window.addEventListener("resize", resizeHandler, false);
 window.addEventListener("message", injectHandler, false);
 
 function load() {
+
   // load assets
   Promise.all([
     loadImage('backgroundImage', config.images.backgroundImage),
@@ -111,7 +112,7 @@ function wait() {
   }
 
   sounds.backgroundMusic.loop = true;
-  playSound(sounds.backgroundMusic, gameMuted);
+  playSound(sounds.backgroundMusic);
 
   x = canvas.width / 2;
   y = canvas.height - paddleHeight - ballRadius - 30;
@@ -127,7 +128,7 @@ function wait() {
     fontFamily: config.style.fontFamily
   });
 
-  overlay.setMute(gameMuted);
+  overlay.setMute(muted);
   overlay.showBanner('Brick Breaker');
   overlay.showButton('Start');
   overlay.setScore(score);
@@ -147,13 +148,15 @@ function clickHandler(e) {
 
   if (target.id === 'button') {
     gameState = 'play';
+
+    // double mute gets around ios mobile sound restrictions
+    mute(); mute();
+
     draw();
   }
 
   if (target.id === 'mute') {
-    gameMuted = !gameMuted;
-    overlay.setMute(gameMuted)
-    playSound(sounds.backgroundMusic, gameMuted);
+    mute();
   }
 }
 
@@ -219,7 +222,7 @@ function checkPaddleCollisions() {
   // check for splash
   if (cy + dy >= canvas.height + ballRadius) {
       lives--;
-      playSound(sounds.dieSound, gameMuted);
+      playSound(sounds.dieSound);
       if (!lives) {
         gameState = 'over';
       }
@@ -241,7 +244,7 @@ function checkBrickCollisions() {
           dy = -dy;
           b.status = 0;
           score++;
-          playSound(sounds.scoreSound, gameMuted);
+          playSound(sounds.scoreSound);
           if (score == brickRowCount * brickColumnCount) {
             gameState = 'win';
           }
@@ -316,12 +319,12 @@ function draw() {
   if (gameState === 'over' || gameState === 'win') {
     if (gameState === 'over') {
       overlay.showBanner("Game Over");
-      playSound(sounds.gameoverSound, gameMuted);
+      playSound(sounds.gameoverSound);
     }
 
     if (gameState === 'win') {
       overlay.showBanner("You Win!");
-      playSound(sounds.winSound, gameMuted);
+      playSound(sounds.winSound);
     }
 
     cancelAnimationFrame(frameId);
@@ -338,7 +341,27 @@ function draw() {
   }
 }
 
-function playSound(sound, muted) {
+function mute() {
+  muted = !muted; // toggle muted
+  overlay.setMute(muted); // update mute display
+
+  if (muted) {
+      // mute all game sounds
+      Object.keys(sounds).forEach((key) => {
+          sounds[key].muted = true;
+          sounds[key].pause();
+      });
+  } else {
+      // unmute all game sounds
+      // and play background music
+      Object.keys(sounds).forEach((key) => {
+          sounds[key].muted = false;
+          sounds.backgroundMusic.play();
+      });
+  }
+}
+
+function playSound(sound) {
   if (!sound) { return; }
 
   sound.currentTime = 0;
@@ -352,6 +375,7 @@ function playSound(sound, muted) {
 // reload game on resize events
 function resizeHandler() {
     document.location.reload();
+    resize();
 }
 
 
@@ -362,7 +386,8 @@ function injectHandler({ data }) {
     if (key === 'ballSpeed') { value = parseInt(value); }
 
     config[scope][key] = value;
-    sounds.backgroundMusic.pause();
+
+    mute();
     load();
   }
 }

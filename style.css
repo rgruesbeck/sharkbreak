@@ -19,7 +19,7 @@ canvas {
 
 .container {
     position: relative;
-    font-size: calc(1vw + 2vh);
+    font-size: calc(2vw + 2vh);
     font-weight: bold;
     height: 100%;
 }
@@ -72,9 +72,9 @@ canvas {
     visibility: hidden;
     opacity: 0;
     position: absolute;
+    margin: 0.5em;
     top: 0;
     left: 0;
-    padding: 1em;
     transition: opacity 3s;
 }
 
@@ -82,9 +82,9 @@ canvas {
     visibility: hidden;
     opacity: 0;
     position: absolute;
-    top: 0;
-    right: 0;
-    padding: 1em;
+    margin: 0.5em;
+    top: 1em;
+    left: 0;
     transition: opacity 3s;
 }
 
@@ -92,7 +92,7 @@ canvas {
     visibility: hidden;
     opacity: 0;
     position: absolute;
-    bottom: 0;
+    top: 0;
     right: 0;
     margin: 0.5em;
     padding: 0.2em;
@@ -103,5 +103,5 @@ canvas {
     border-radius: 100%;
     cursor: pointer;
     transition: opacity 3s;
-    font-size: calc(1vw + 2vh);
+    font-size: calc(2vw + 3vh);
 }
