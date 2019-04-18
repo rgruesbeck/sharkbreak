@@ -9,19 +9,22 @@ var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 
 var overlayNode = document.getElementById("overlay");
-var overlay = new Overlay(overlayNode);
+var overlay = new Overlay(overlayNode, {
+    textColor: config.style.textColor,
+    primaryColor: config.style.primaryColor,
+    fontFamily: config.style.fontFamily
+});
 
 // set canvas width and height
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-//canvas.height = (typeof window.orientation !== "undefined") ? window.innerHeight - 44 : window.innerHeight; // mobile top bar hack for now
+document.body.style.backgroundColor = config.style.backgroundColor;
+resize();
 
 var gameScale = ((canvas.width + canvas.height) / 270);
 
 var images = {};
 var sounds = {};
 var fonts = {};
-var muted = true;
+var muted = localStorage.getItem('brickbreaker-muted') === 'true';
 
 var ballRadius = 3 * gameScale;
 var ballSpin = 0.2;
@@ -63,7 +66,10 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
 document.addEventListener("touchmove", touchMoveHandler, false);
+
 window.addEventListener("resize", resizeHandler, false);
+window.addEventListener("orientationchange", resizeHandler, false);
+
 window.addEventListener("message", injectHandler, false);
 
 function load() {
@@ -96,6 +102,9 @@ function load() {
       if (type === 'font') {
         fonts[key] = value;
       }
+
+      overlay.hideLoading();
+      canvas.style.opacity = 1;
     });
 
     wait();
@@ -122,15 +131,9 @@ function wait() {
   drawBricks();
   drawPaddle();
 
-  overlay.setStyles({
-    textColor: config.style.textColor,
-    primaryColor: config.style.primaryColor,
-    fontFamily: config.style.fontFamily
-  });
-
   overlay.setMute(muted);
-  overlay.showBanner('Brick Breaker');
-  overlay.showButton('Start');
+  overlay.setBanner('Brick Breaker');
+  overlay.setButton('Start');
   overlay.setScore(score);
   overlay.setLives(lives);
   overlay.showStats();
@@ -318,12 +321,12 @@ function draw() {
 
   if (gameState === 'over' || gameState === 'win') {
     if (gameState === 'over') {
-      overlay.showBanner("Game Over");
+      overlay.setBanner("Game Over");
       playSound(sounds.gameoverSound);
     }
 
     if (gameState === 'win') {
-      overlay.showBanner("You Win!");
+      overlay.setBanner("You Win!");
       playSound(sounds.winSound);
     }
 
@@ -342,7 +345,14 @@ function draw() {
 }
 
 function mute() {
-  muted = !muted; // toggle muted
+  // toggle muted
+  let key = 'brickbreaker-muted';
+  localStorage.setItem(
+    key,
+    localStorage.getItem(key) === 'true' ? 'false' : 'true'
+  );
+  muted = localStorage.getItem(key) === 'true';
+
   overlay.setMute(muted); // update mute display
 
   if (muted) {
@@ -359,6 +369,8 @@ function mute() {
           sounds.backgroundMusic.play();
       });
   }
+
+  console.log(muted, localStorage.getItem('brickbreaker-muted'), typeof muted);
 }
 
 function playSound(sound) {
@@ -372,9 +384,32 @@ function playSound(sound) {
   }
 }
 
+function resize() {
+  let maxWidth = parseInt(config.general.maxWidth);
+
+  // get new width and height
+  let newWidth = window.innerWidth < maxWidth ? window.innerWidth : maxWidth;
+  let newHeight = window.innerHeight;
+
+  // set new canvas width and height
+  canvas.width = newWidth;
+  canvas.height = newHeight;
+
+  // center the canvas and set new width on overlay
+  canvas.style.marginLeft = `${(window.innerWidth - newWidth)/2}px`;
+  overlay.container.style.maxWidth = `${newWidth}px`;
+
+
+  if (gameState === 'waiting') {
+    // reset paddle position
+    paddleX = (canvas.width - paddleWidth) / 2;
+
+    wait();
+  }
+}
+
 // reload game on resize events
 function resizeHandler() {
-    document.location.reload();
     resize();
 }
 

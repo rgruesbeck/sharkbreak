@@ -44,7 +44,7 @@ const loadSound = function(key, url) {
     let sound = new Audio(url);
     sound.preload = 'auto';
     sound.autoplay = false;
-    sound.oncanplaythrough = function() {
+    sound.oncanplay = function() {
       resolve({
         type: 'sound',
         key: key,

@@ -2,6 +2,7 @@
   "general": {
     "name": "Brick Breaker",
     "buttonText": "Start",
+    "maxWidth": "1080",
     "ballSpeed": "3",
     "lives": "3",
     "rows": "4"
@@ -20,6 +21,10 @@
         {
           "key": "buttonText",
           "name": "Start Button Text"
+        },
+        {
+          "key": "maxWidth",
+          "name": "Max width on large screens"
         },
         {
           "key": "ballSpeed",

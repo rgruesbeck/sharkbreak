@@ -1,24 +1,33 @@
 // Overlay wrapper
 
 class Overlay {
-    constructor(node) {
+    constructor(node, styles) {
         this.root = node;
 
         this.container = node.querySelector('.container');
+
+        this.loading = node.querySelector('#loading');
         this.banner = node.querySelector('#banner');
         this.button = node.querySelector('#button');
+
         this.score = node.querySelector('#score');
         this.lives = node.querySelector('#lives');
         this.mute = node.querySelector('#mute');
 
-        this.styles = {
-            textColor: 'white',
-            primaryColor: 'purple',
-            fontFamily: 'Courier New'
-        };
+        this.styles = styles;
+
+        this.applyStyles();
     }
 
-    showBanner(message) {
+    setLoading(url) {
+        this.loading.src = url;
+    }
+
+    hideLoading() {
+        this.hide('loading');
+    }
+
+    setBanner(message) {
         this.banner.textContent = message;
         this.show('banner');
     }
@@ -27,7 +36,7 @@ class Overlay {
         this.hide('banner');
     }
 
-    showButton(message) {
+    setButton(message) {
         this.button.style.fontFamily = this.styles.fontFamily;
         this.button.textContent = message;
         this.show('button');
@@ -50,16 +59,13 @@ class Overlay {
         this.lives.textContent = `Lives: ${lives}`;
     }
 
-    setStyles(styles) {
-        this.styles = { ...this.styles, ...styles };
-        this.applyStyles();
-    }
-
     applyStyles() {
         this.container.style.color = this.styles.textColor;
         this.container.style.fontFamily = this.styles.fontFamily;
 
         this.button.style.borderColor = this.styles.primaryColor;
+
+        this.setLoading(this.styles.loadingImage);
     }
 
     setMute(muted) {

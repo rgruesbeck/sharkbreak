@@ -2,7 +2,7 @@
   "style": {
     "textColor": "#ffffff",
     "primaryColor": "#c58a20",
-    "backgroundColor": "#41557f",
+    "backgroundColor": "black",
     "fontFamily": "https://fonts.googleapis.com/css?family=Space Mono"
   },
   "@@editor": [

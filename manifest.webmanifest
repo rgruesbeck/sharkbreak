@@ -1,1 +1,1 @@
-{"fingerprints":false,"name":"Brick Breaker","short_name":"Brick Breaker","start_url":".","display":"standalone","description":"A customizable brick breaker game.","background_color":"#41557f","theme_color":"#c58a20","icons":[{"src":"https://i.imgur.com/ifqjjU0.png","sizes":"32x32"}]}
+{"fingerprints":false,"name":"Brick Breaker","short_name":"Brick Breaker","start_url":".","display":"standalone","description":"A customizable brick breaker game.","background_color":"black","theme_color":"#c58a20","icons":[{"src":"https://i.imgur.com/ifqjjU0.png","sizes":"32x32"}]}
