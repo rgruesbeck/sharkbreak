@@ -19,8 +19,8 @@ class Overlay {
         this.applyStyles();
     }
 
-    setLoading(url) {
-        this.loading.src = url;
+    setLoading() {
+        this.show('loading');
     }
 
     hideLoading() {
