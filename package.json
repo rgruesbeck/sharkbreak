@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "install": "yard install",
     "start": "npm run dev",
     "dev": "npx watch 'npm run config' .koji & parcel index.html",
     "build": "npm run config; parcel build index.html",
