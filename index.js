@@ -134,6 +134,10 @@ function wait() {
   overlay.setMute(muted);
   overlay.setBanner('Brick Breaker');
   overlay.setButton('Start');
+  overlay.setInstructions({
+    desktop: config.general.instructionsDesktop,
+    mobile: config.general.instructionsMobile
+  });
   overlay.setScore(score);
   overlay.setLives(lives);
   overlay.showStats();
@@ -317,6 +321,7 @@ function draw() {
   if (gameState === 'play') {
     overlay.hideBanner();
     overlay.hideButton();
+    overlay.hideInstructions();
   }
 
   if (gameState === 'over' || gameState === 'win') {
@@ -336,7 +341,7 @@ function draw() {
     setTimeout(() => {
       reset();
       load();
-    }, 5000);
+    }, 2000);
   } else {
 
     // get new animation frame from browser

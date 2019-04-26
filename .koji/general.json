@@ -2,6 +2,8 @@
   "general": {
     "name": "Brick Breaker",
     "buttonText": "Start",
+    "instructionsMobile": "Swipe left or right to move paddle",
+    "instructionsDesktop": "Use Left and Right arrow keys to move paddle",
     "maxWidth": "1080",
     "ballSpeed": "3",
     "lives": "3",
@@ -21,6 +23,14 @@
         {
           "key": "buttonText",
           "name": "Start Button Text"
+        },
+        {
+          "key": "instructionsMobile",
+          "name": "How to play the game on mobile"
+        },
+        {
+          "key": "instructionsDesktop",
+          "name": "How to play the game on desktop"
         },
         {
           "key": "maxWidth",

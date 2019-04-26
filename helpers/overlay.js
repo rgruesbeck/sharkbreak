@@ -10,6 +10,8 @@ class Overlay {
         this.banner = node.querySelector('#banner');
         this.button = node.querySelector('#button');
 
+        this.instructions = node.querySelector('#instructions');
+
         this.score = node.querySelector('#score');
         this.lives = node.querySelector('#lives');
         this.mute = node.querySelector('#mute');
@@ -44,6 +46,24 @@ class Overlay {
 
     hideButton() {
         this.hide('button');
+    }
+
+    setInstructions({ desktop, mobile }) {
+        console.log('hello', desktop, mobile, this);
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
+            // show mobile instructions
+
+            this.instructions.textContent = mobile;
+        } else {
+            // show desktop instructions
+
+            this.instructions.textContent = desktop;
+        }
+        this.show('instructions');
+    }
+
+    hideInstructions() {
+        this.hide('instructions');
     }
 
     showStats() {
