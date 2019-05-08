@@ -1,0 +1,46 @@
+{
+  "sounds": {
+    "backgroundMusic": "https://objects.koji-cdn.com/652aab00-af52-421e-993d-1d614b6c3a99/1825d36c-129c-48d3-b5bc-87f7b428cce0.mp3",
+    "winSound": "https://objects.koji-cdn.com/d659a1cd-54ca-41c1-906f-3b7b5f6aeb7d/winSound.mp3",
+    "gameoverSound": "https://objects.koji-cdn.com/652aab00-af52-421e-993d-1d614b6c3a99/382310__myfox14__game-over-arcade.wav",
+    "scoreSound": "https://objects.koji-cdn.com/d659a1cd-54ca-41c1-906f-3b7b5f6aeb7d/scoreSound.mp3",
+    "dieSound": "https://objects.koji-cdn.com/652aab00-af52-421e-993d-1d614b6c3a99/364929__josepharaoh99__game-die.mp3"
+  },
+  "@@editor": [{
+    "key": "sounds",
+    "name": "Sounds",
+    "icon": "🔊️",
+    "source": "sounds.json",
+    "fields": [{
+        "key": "backgroundMusic",
+        "name": "Background Music",
+        "description": "URL of audio file to loop in background",
+        "type": "sound"
+      },
+      {
+        "key": "winSound",
+        "name": "Win Sound",
+        "description": "URL of audio file to play when you win",
+        "type": "sound"
+      },
+      {
+        "key": "gameoverSound",
+        "name": "Game Over Sound",
+        "description": "URL of audio file to play when game over",
+        "type": "sound"
+      },
+      {
+        "key": "scoreSound",
+        "name": "Score Sound",
+        "description": "URL of audio file to play when player scores a point",
+        "type": "sound"
+      },
+      {
+        "key": "dieSound",
+        "name": "Die Sound",
+        "description": "URL of audio file to play when when player looses a life",
+        "type": "sound"
+      }
+    ]
+  }]
+}

@@ -1,5 +1,7 @@
 // Brick Breaker
-var config = require('./config.json');
+import Koji from 'koji-tools';
+Koji.pageLoad();
+const config = Koji.config;
 
 import { requestAnimationFrame, cancelAnimationFrame } from './helpers/animationframe.js';
 import { loadImage, loadSound, loadFont } from './helpers/loaders.js';
@@ -8,71 +10,100 @@ import Overlay from './helpers/overlay.js';
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 
+// get new width and height
+var maxWidth = parseInt(config.settings.maxWidth);
+var newWidth = window.innerWidth < maxWidth ? window.innerWidth : maxWidth;
+var newHeight = window.innerHeight;
+
+// set new canvas width and height
+canvas.width = newWidth;
+canvas.height = newHeight;
+
+// center the canvas and set new width on overlay
+canvas.style.marginLeft = `${(window.innerWidth - newWidth)/2}px`;
+
+// setup overlay
 var overlayNode = document.getElementById("overlay");
-var overlay = new Overlay(overlayNode, {
-    textColor: config.style.textColor,
-    primaryColor: config.style.primaryColor,
-    fontFamily: config.style.fontFamily
-});
+var overlay = new Overlay(overlayNode, {...config.colors, ...config.settings});
+overlay.container.style.maxWidth = `${newWidth}px`;
 
-// set canvas width and height
-document.body.style.backgroundColor = config.style.backgroundColor;
-resize();
-
+// setup input and screen
+var input = { right: false, left: false };
 var gameScale = ((canvas.width + canvas.height) / 270);
+var screen = {
+  top: 0,
+  right: canvas.width,
+  bottom: canvas.height,
+  left: 0,
+};
+
+// setup frame
+var frame = {
+  count: 0
+}
 
 var images = {};
 var sounds = {};
 var fonts = {};
-var muted = localStorage.getItem('brickbreaker-muted') === 'true';
 
 var ballRadius = 3 * gameScale;
-var ballSpin = 0.2;
-var x = canvas.width / 2;
+var x = screen / 2;
 var y = canvas.height - 30;
-var r = 0;
 var dx = 0.005 * canvas.width;
 var dy = -0.005 * canvas.height;
-var speed = parseInt(config.general.ballSpeed);
+var speed = parseInt(config.settings.ballSpeed);
 var paddleHeight = 10 * gameScale;
 var paddleWidth = 30 * gameScale;
 var paddleX = (canvas.width - paddleWidth) / 2;
 var paddleXprev = 0;
-var paddleDx = 0.018 * canvas.width;
-var rightPressed = false;
-var leftPressed = false;
+var paddleDx = 0.1 * canvas.width;
 var brickWidth = 12 * gameScale;
 var brickHeight = 5 * gameScale;
 var brickPadding = 4 * gameScale;
 var brickOffsetTop = 15 * gameScale;
 var brickOffsetLeft = 2 * gameScale;
 var brickRowCount = Math.floor(canvas.width / (brickWidth + brickPadding + brickOffsetLeft));
-var brickColumnCount = config.general.rows;
-var frameId = 0;
-var gameState = 'waiting';
+var brickColumnCount = parseInt(config.settings.rows);
 var score = 0;
-var lives = config.general.lives;
-
+var lives = parseInt(config.settings.lives);
 var bricks = [];
-for (var c = 0; c < brickColumnCount; c++) {
-  bricks[c] = [];
-  for (var r = 0; r < brickRowCount; r++) {
-    bricks[c][r] = { x: 0, y: 0, status: 1 };
+
+function start() {
+  // build bricks
+  for (var c = 0; c < brickColumnCount; c++) {
+    bricks[c] = [];
+    for (var r = 0; r < brickRowCount; r++) {
+      bricks[c][r] = {
+        x: 0,
+        y: 0,
+        status: 1
+      };
+    }
   }
+
+  // register event handlers
+  document.addEventListener("click", ({
+    target
+  }) => clickHandler(target));
+  document.addEventListener('keydown', ({
+    code
+  }) => handleKeys('keydown', code))
+  document.addEventListener('keyup', ({
+    code
+  }) => handleKeys('keyup', code))
+  document.addEventListener("mousemove", mouseMoveHandler);
+  document.addEventListener("touchmove", touchMoveHandler);
+
+  // reset game on resize and orientation change
+  window.addEventListener("resize", reset);
+  window.addEventListener("orientationchange", reset);
+
+  // load game
+  load();
 }
 
-document.addEventListener("click", clickHandler, false);
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-document.addEventListener("mousemove", mouseMoveHandler, false);
-document.addEventListener("touchmove", touchMoveHandler, false);
-
-window.addEventListener("resize", resizeHandler, false);
-window.addEventListener("orientationchange", resizeHandler, false);
-
-window.addEventListener("message", injectHandler, false);
-
 function load() {
+  setState({ current: 'loading' });
 
   // load assets
   Promise.all([
@@ -85,9 +116,10 @@ function load() {
     loadSound('gameoverSound', config.sounds.gameoverSound),
     loadSound('scoreSound', config.sounds.scoreSound),
     loadSound('dieSound', config.sounds.dieSound),
-    loadFont(config.style.fontFamily)
+    loadFont(config.settings.fontFamily)
   ]).then((assets) => {
     assets.forEach(({ type, key, value}) => {
+
       // set images
       if (type === 'image') {
         images[key] = value;
@@ -103,44 +135,121 @@ function load() {
         fonts[key] = value;
       }
 
-      overlay.hideLoading();
-      canvas.style.opacity = 1;
     });
 
-    wait();
+    overlay.hideLoading();
+    canvas.style.opacity = 1;
+
+
+    setState({ current: 'ready' });
+    play();
   });
 }
 
-function reset() {
-  document.location.reload();
-}
+function play() {
+  // clear screen
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-function wait() {
-  if (frameId > 0) {
-      cancelAnimationFrame(frameId);
-  }
+  overlay.setScore(score);
+  overlay.setLives(lives);
 
-  sounds.backgroundMusic.loop = true;
-  playSound(sounds.backgroundMusic);
-
-  x = canvas.width / 2;
-  y = canvas.height - paddleHeight - ballRadius - 30;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height); //clear screen
   drawBackground();
   drawBricks();
   drawPaddle();
 
-  overlay.setMute(muted);
-  overlay.setBanner('Brick Breaker');
-  overlay.setButton('Start');
-  overlay.setInstructions({
-    desktop: config.general.instructionsDesktop,
-    mobile: config.general.instructionsMobile
-  });
-  overlay.setScore(score);
-  overlay.setLives(lives);
-  overlay.showStats();
+  if (state.current === 'ready') {
+    sounds.backgroundMusic.loop = true;
+    playSound(sounds.backgroundMusic);
+
+    x = canvas.width / 2;
+    y = canvas.height - paddleHeight - ballRadius - 30;
+
+    overlay.setMute(state.muted);
+    overlay.setBanner(config.settings.name);
+    overlay.setButton(config.settings.startText);
+    overlay.setInstructions({
+      desktop: config.settings.instructionsDesktop,
+      mobile: config.settings.instructionsMobile
+    });
+    overlay.showStats();
+  }
+
+  if (state.current === 'play') {
+    if (state.prev === 'ready') {
+      overlay.hideBanner();
+      overlay.hideButton();
+      overlay.hideInstructions();
+    }
+
+    drawBall();
+
+    checkPaddleCollisions();
+    checkBrickCollisions();
+    checkWallCollisions();
+
+    // move paddle
+    if (input.right && paddleX < canvas.width - paddleWidth) {
+      paddleXprev = paddleX;
+      paddleX += paddleDx;
+    } else if (input.left && paddleX > 0) {
+      paddleXprev = paddleX;
+      paddleX -= paddleDx;
+    }
+
+    x += dx * speed;
+    y += dy * speed;
+
+  }
+
+  // game win
+  if (state.current === 'win') {
+      overlay.setBanner("You Win!");
+      playSound(sounds.winSound);
+
+      cancelAnimationFrame(frame.count - 1);
+  }
+
+  // game over
+  if (state.current === 'over') {
+      overlay.setBanner("Game Over");
+      playSound(sounds.gameoverSound);
+
+      cancelAnimationFrame(frame.count - 1);
+  }
+
+  if (['play', 'ready' ].includes(state.current)) {
+
+    // get new animation frame from browser
+    frame.count = requestAnimationFrame(play);
+  }
+}
+
+function drawBackground() {
+  ctx.drawImage(images.backgroundImage, 0, 0, canvas.width, canvas.height);
+}
+
+function drawBall() {
+  ctx.drawImage(images.ballImage, x, y, ballRadius * 2, ballRadius * 2);
+}
+
+function drawPaddle() {
+  ctx.drawImage(images.paddleImage, paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+}
+
+function drawBricks() {
+  var rowWidth = brickRowCount * (brickWidth + brickOffsetLeft);
+  var rowOffset = ((canvas.width - rowWidth) / 3);
+  for (var c = 0; c < brickColumnCount; c++) {
+    for (var r = 0; r < brickRowCount; r++) {
+      if (bricks[c][r].status == 1) {
+        var brickX = (r * (brickWidth + brickPadding)) + brickOffsetLeft + rowOffset;
+        var brickY = (c * (brickHeight + brickPadding)) + brickOffsetTop;
+        bricks[c][r].x = brickX;
+        bricks[c][r].y = brickY;
+        ctx.drawImage(images.brickImage, brickX, brickY, brickWidth, brickHeight);
+      }
+    }
+  }
 }
 
 function restart() {
@@ -150,55 +259,22 @@ function restart() {
   dy = -0.005 * canvas.height;
 }
 
-function clickHandler(e) {
-  const { target } = e;
-
+function clickHandler(target) {
   if (target.id === 'button') {
-    gameState = 'play';
-
     // double mute gets around ios mobile sound restrictions
     mute(); mute();
 
-    draw();
+    setState({ current: 'play' });
   }
 
   if (target.id === 'mute') {
     mute();
   }
-}
 
-function keyDownHandler(e) {
-  if (e.key == "Right" || e.key == "ArrowRight") {
-    rightPressed = true;
+  if (['win', 'over'].includes(state.current)) {
+    reset();
   }
-  else if (e.key == "Left" || e.key == "ArrowLeft") {
-    leftPressed = true;
-  }
-}
 
-function keyUpHandler(e) {
-  if (e.key == "Right" || e.key == "ArrowRight") {
-    rightPressed = false;
-  }
-  else if (e.key == "Left" || e.key == "ArrowLeft") {
-    leftPressed = false;
-  }
-}
-
-function mouseMoveHandler(e) {
-  var relativeX = e.clientX - canvas.offsetLeft;
-  if (relativeX > 0 && relativeX < canvas.width) {
-    paddleXprev = paddleX;
-    paddleX = relativeX - paddleWidth / 2;
-  }
-}
-
-function touchMoveHandler(e) {
-  var relativeX = e.touches[0].clientX - canvas.offsetLeft;
-  if (relativeX > 0 && relativeX < canvas.width) {
-    paddleXprev = paddleX;
-    paddleX = relativeX - paddleWidth / 2;
-  }
 }
 
 function checkWallCollisions() {
@@ -231,7 +307,7 @@ function checkPaddleCollisions() {
       lives--;
       playSound(sounds.dieSound);
       if (!lives) {
-        gameState = 'over';
+        setState({ current: 'over' });
       }
       else {
         restart();
@@ -253,99 +329,11 @@ function checkBrickCollisions() {
           score++;
           playSound(sounds.scoreSound);
           if (score == brickRowCount * brickColumnCount) {
-            gameState = 'win';
+            setState({ current: 'win' });
           }
         }
       }
     }
-  }
-}
-
-function drawBackground() {
-  ctx.drawImage(images.backgroundImage, 0, 0, canvas.width, canvas.height);
-}
-
-function drawBall() {
-  ctx.drawImage(images.ballImage, x, y, ballRadius * 2, ballRadius * 2);
-}
-
-function drawPaddle() {
-  ctx.drawImage(images.paddleImage, paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
-}
-
-function drawBricks() {
-  var rowWidth = brickRowCount * (brickWidth + brickOffsetLeft);
-  var rowOffset = ((canvas.width - rowWidth) / 3);
-  for (var c = 0; c < brickColumnCount; c++) {
-    for (var r = 0; r < brickRowCount; r++) {
-      if (bricks[c][r].status == 1) {
-        var brickX = (r * (brickWidth + brickPadding)) + brickOffsetLeft + rowOffset;
-        var brickY = (c * (brickHeight + brickPadding)) + brickOffsetTop;
-        bricks[c][r].x = brickX;
-        bricks[c][r].y = brickY;
-        ctx.drawImage(images.brickImage, brickX, brickY, brickWidth, brickHeight);
-      }
-    }
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  checkPaddleCollisions();
-  checkBrickCollisions();
-  checkWallCollisions();
-
-  // move paddle
-  if (rightPressed && paddleX < canvas.width - paddleWidth) {
-    paddleXprev = paddleX;
-    paddleX += paddleDx;
-  }
-  else if (leftPressed && paddleX > 0) {
-    paddleXprev = paddleX;
-    paddleX -= paddleDx;
-  }
-
-  x += dx * speed;
-  y += dy * speed;
-  r += ballSpin;
-
-  drawBackground();
-  drawBricks();
-  drawBall();
-  drawPaddle();
-
-  overlay.setScore(score);
-  overlay.setLives(lives);
-
-  if (gameState === 'play') {
-    overlay.hideBanner();
-    overlay.hideButton();
-    overlay.hideInstructions();
-  }
-
-  if (gameState === 'over' || gameState === 'win') {
-    if (gameState === 'over') {
-      overlay.setBanner("Game Over");
-      playSound(sounds.gameoverSound);
-    }
-
-    if (gameState === 'win') {
-      overlay.setBanner("You Win!");
-      playSound(sounds.winSound);
-    }
-
-    cancelAnimationFrame(frameId);
-    sounds.backgroundMusic.pause();
-
-    setTimeout(() => {
-      reset();
-      load();
-    }, 2000);
-  } else {
-
-    // get new animation frame from browser
-    frameId = requestAnimationFrame(draw);
   }
 }
 
@@ -356,11 +344,10 @@ function mute() {
     key,
     localStorage.getItem(key) === 'true' ? 'false' : 'true'
   );
-  muted = localStorage.getItem(key) === 'true';
+  state.muted = localStorage.getItem(key) === 'true';
+  overlay.setMute(state.muted); // update mute display
 
-  overlay.setMute(muted); // update mute display
-
-  if (muted) {
+  if (state.muted) {
       // mute all game sounds
       Object.keys(sounds).forEach((key) => {
           sounds[key].muted = true;
@@ -374,63 +361,85 @@ function mute() {
           sounds.backgroundMusic.play();
       });
   }
+}
 
-  console.log(muted, localStorage.getItem('brickbreaker-muted'), typeof muted);
+function handleKeys(type, code) {
+
+  if (type === 'keydown') {
+
+    if (code === 'ArrowRight') {
+      input.right = true;
+    }
+
+    if (code === 'ArrowLeft') {
+      input.left = true;
+    }
+  }
+
+  if (type === 'keyup') {
+
+    if (code === 'ArrowRight') {
+      input.right = false;
+    }
+
+    if (code === 'ArrowLeft') {
+      input.left = false;
+    }
+  }
+}
+
+function mouseMoveHandler(e) {
+  var relativeX = e.clientX - canvas.offsetLeft;
+  if (relativeX > 0 && relativeX < canvas.width) {
+    paddleXprev = paddleX;
+    paddleX = relativeX - paddleWidth / 2;
+  }
+}
+
+function touchMoveHandler(e) {
+  var relativeX = e.touches[0].clientX - canvas.offsetLeft;
+  if (relativeX > 0 && relativeX < canvas.width) {
+    paddleXprev = paddleX;
+    paddleX = relativeX - paddleWidth / 2;
+  }
 }
 
 function playSound(sound) {
   if (!sound) { return; }
 
   sound.currentTime = 0;
-  if (!muted) { 
+  if (!state.muted) { 
     sound.play();
   } else {
     sound.pause();
   }
 }
 
-function resize() {
-  let maxWidth = parseInt(config.general.maxWidth);
+function sizeCanvas() {
 
-  // get new width and height
-  let newWidth = window.innerWidth < maxWidth ? window.innerWidth : maxWidth;
-  let newHeight = window.innerHeight;
-
-  // set new canvas width and height
-  canvas.width = newWidth;
-  canvas.height = newHeight;
-
-  // center the canvas and set new width on overlay
-  canvas.style.marginLeft = `${(window.innerWidth - newWidth)/2}px`;
-  overlay.container.style.maxWidth = `${newWidth}px`;
-
-
-  if (gameState === 'waiting') {
-    // reset paddle position
-    paddleX = (canvas.width - paddleWidth) / 2;
-
-    wait();
-  }
 }
 
-// reload game on resize events
-function resizeHandler() {
-    resize();
+function reset() {
+  document.location.reload();
+}
+
+var state = {
+  current: 'loading',
+  prev: '',
+  muted: localStorage.getItem('brickbreaker-muted') === 'true'
+};
+
+function setState(newState) {
+  state = {
+    ...state,
+    ...{ prev: state.current },
+    ...newState
+  };
 }
 
 
-// koji injection handler
-function injectHandler({ data }) {
-  if (data.action === 'injectGlobal') {
-    let { scope, key, value } = data.payload;
-    if (key === 'ballSpeed') { value = parseInt(value); }
+// set background color
+document.body.style.backgroundColor = config.colors.backgroundColor;
 
-    config[scope][key] = value;
-
-    mute();
-    load();
-  }
-}
-
-// load game and wait to start
-load();
+// start game
+start();

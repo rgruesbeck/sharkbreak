@@ -4,17 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prestart": "koji-tools watch &",
     "start": "npm run dev",
-    "dev": "npx watch 'npm run config' .koji & parcel index.html",
-    "build": "npm run config; parcel build index.html",
-    "config": "node config.js",
+    "dev": "npx parcel index.html",
+    "build": "npx parcel build index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "parcel-bundler": "^1.12.3",
-    "watch": "^1.0.2"
+    "koji-tools": "^0.2.6",
+    "parcel-bundler": "^1.12.3"
   }
 }

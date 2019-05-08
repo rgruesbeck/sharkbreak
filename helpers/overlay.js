@@ -17,7 +17,6 @@ class Overlay {
         this.mute = node.querySelector('#mute');
 
         this.styles = styles;
-
         this.applyStyles();
     }
 
@@ -49,7 +48,6 @@ class Overlay {
     }
 
     setInstructions({ desktop, mobile }) {
-        console.log('hello', desktop, mobile, this);
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
             // show mobile instructions
 
@@ -82,10 +80,7 @@ class Overlay {
     applyStyles() {
         this.container.style.color = this.styles.textColor;
         this.container.style.fontFamily = this.styles.fontFamily;
-
         this.button.style.borderColor = this.styles.primaryColor;
-
-        this.setLoading(this.styles.loadingImage);
     }
 
     setMute(muted) {
