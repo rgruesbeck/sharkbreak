@@ -42,6 +42,25 @@ var frame = {
   count: 0
 }
 
+// game state
+var state = {
+  current: 'loading',
+  prev: '',
+  muted: localStorage.getItem('brickbreaker-muted') === 'true',
+  score: 0,
+  lives: parseInt(config.settings.lives),
+  ballSpeed: parseInt(config.settings.ballSpeed)
+};
+
+function setState(newState) {
+  state = {
+    ...state,
+    ...{ prev: state.current },
+    ...newState
+  };
+}
+
+
 var images = {};
 var sounds = {};
 var fonts = {};
@@ -64,12 +83,18 @@ var brickOffsetTop = 15 * gameScale;
 var brickOffsetLeft = 2 * gameScale;
 var brickRowCount = Math.floor(canvas.width / (brickWidth + brickPadding + brickOffsetLeft));
 var brickColumnCount = parseInt(config.settings.rows);
-var score = 0;
-var lives = parseInt(config.settings.lives);
 var bricks = [];
 
 function start() {
+  // reset from config
+  setState({
+    lives: parseInt(config.settings.lives),
+    ballSpeed: parseInt(config.settings.ballSpeed)
+  });
+
   // build bricks
+  brickColumnCount = parseInt(config.settings.rows);
+
   for (var c = 0; c < brickColumnCount; c++) {
     bricks[c] = [];
     for (var r = 0; r < brickRowCount; r++) {
@@ -82,21 +107,25 @@ function start() {
   }
 
   // register event handlers
-  document.addEventListener("click", ({
-    target
-  }) => clickHandler(target));
-  document.addEventListener('keydown', ({
-    code
-  }) => handleKeys('keydown', code))
-  document.addEventListener('keyup', ({
-    code
-  }) => handleKeys('keyup', code))
+  document.addEventListener("click", ({ target }) => clickHandler(target));
+  document.addEventListener('keydown', ({ code }) => handleKeys('keydown', code));
+  document.addEventListener('keyup', ({ code }) => handleKeys('keyup', code));
+
   document.addEventListener("mousemove", mouseMoveHandler);
   document.addEventListener("touchmove", touchMoveHandler);
 
   // reset game on resize and orientation change
   window.addEventListener("resize", reset);
   window.addEventListener("orientationchange", reset);
+
+  // handle koji config changes
+  Koji.on('change', (scope, key, value) => {
+    console.log('updating configs...', scope, key, value);
+    config[scope][key] = value;
+    cancelAnimationFrame(frame.count - 1);
+    start();
+  });
+
 
   // load game
   load();
@@ -150,8 +179,8 @@ function play() {
   // clear screen
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  overlay.setScore(score);
-  overlay.setLives(lives);
+  overlay.setScore(state.score);
+  overlay.setLives(state.lives);
 
   drawBackground();
   drawBricks();
@@ -196,8 +225,8 @@ function play() {
       paddleX -= paddleDx;
     }
 
-    x += dx * speed;
-    y += dy * speed;
+    x += dx * state.ballSpeed;
+    y += dy * state.ballSpeed;
 
   }
 
@@ -304,9 +333,10 @@ function checkPaddleCollisions() {
 
   // check for splash
   if (cy + dy >= canvas.height + ballRadius) {
-      lives--;
+      setState({ lives: state.lives - 1 });
+
       playSound(sounds.dieSound);
-      if (!lives) {
+      if (!state.lives) {
         setState({ current: 'over' });
       }
       else {
@@ -326,9 +356,9 @@ function checkBrickCollisions() {
         if (cx > b.x && cx < b.x + brickWidth && cy > b.y && cy < b.y + brickHeight) {
           dy = -dy;
           b.status = 0;
-          score++;
+          setState({ score: state.score + 1 });
           playSound(sounds.scoreSound);
-          if (score == brickRowCount * brickColumnCount) {
+          if (state.score == brickRowCount * brickColumnCount) {
             setState({ current: 'win' });
           }
         }
@@ -421,20 +451,6 @@ function sizeCanvas() {
 
 function reset() {
   document.location.reload();
-}
-
-var state = {
-  current: 'loading',
-  prev: '',
-  muted: localStorage.getItem('brickbreaker-muted') === 'true'
-};
-
-function setState(newState) {
-  state = {
-    ...state,
-    ...{ prev: state.current },
-    ...newState
-  };
 }
 
 
