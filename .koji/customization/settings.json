@@ -2,13 +2,15 @@
   "settings": {
     "name": "Brick Breaker",
     "startText": "Start",
+    "winText": "You Win",
+    "gameoverText": "Game Over",
     "instructionsMobile": "Swipe left or right to move paddle",
     "instructionsDesktop": "Use Left and Right arrow keys to move paddle",
     "maxWidth": 1080,
     "ballSpeed": 3,
     "lives": 3,
     "rows": 4,
-    "fontFamily": "https://fonts.googleapis.com/css?family=Space Mono"
+    "fontFamily": "Space Mono"
   },
   "@@editor": [{
     "key": "settings",
@@ -22,6 +24,14 @@
       {
         "key": "startText",
         "name": "Start Button Text"
+      },
+      {
+        "key": "winText",
+        "name": "Win Text"
+      },
+      {
+        "key": "gameoverText",
+        "name": "Game Over Text"
       },
       {
         "key": "instructionsMobile",

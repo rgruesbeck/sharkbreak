@@ -81,7 +81,7 @@ class Overlay {
     applyStyles() {
         this.container.style.color = this.styles.textColor;
         this.container.style.fontFamily = this.styles.fontFamily;
-        this.button.style.borderColor = this.styles.primaryColor;
+        this.button.style.backgroundColor = this.styles.primaryColor;
     }
 
     setMute(muted) {

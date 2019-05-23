@@ -1,3 +1,5 @@
+const WebFont = require('webfontloader');
+
 const loadImage = function(key, url) {
   return new Promise((resolve, reject) => {
     let image = new Image;
@@ -13,29 +15,22 @@ const loadImage = function(key, url) {
 
 }
 
-const loadFont = function(fontSrc) {
+
+const loadFont = (key, fontName) => {
   return new Promise((resolve, reject) => {
-    if (!fontSrc.includes('http')) {
-      resolve(fontSrc);
+    let font = {
+      google: {
+        families: [fontName]
+      },
+      fontactive: function (familyName) {
+        resolve({
+          type: 'font',
+          key: key,
+          value: familyName
+        })
+      }
     }
-
-    let link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.type = 'text/css';
-    link.href = fontSrc;
-    document.getElementsByTagName('head')[0].appendChild(link);
-
-    // Trick from https://stackoverflow.com/questions/2635814/
-    let image = new Image;
-    image.src = link.href;
-    image.onerror = function () {
-      var match = fontSrc.match(/family=(.*?)$/)[1];
-      var fontName = `"${match.replace('+', ' ')}"`;
-      resolve({
-        type: 'font',
-        value: fontName
-      });
-    };
+    WebFont.load(font);
   });
 }
 

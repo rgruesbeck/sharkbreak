@@ -1,9 +1,9 @@
 {
   "images": {
-    "backgroundImage": "https://images.koji-cdn.com/fb75cf82-ff13-495f-8b58-8f649e213840/48ffd74a-bfbe-4617-af28-0638a42542af.jpg",
-    "ballImage": "https://images.koji-cdn.com/fb75cf82-ff13-495f-8b58-8f649e213840/450cf331-fa84-4f6d-9b30-ffe266fae7ea.png",
-    "paddleImage": "https://images.koji-cdn.com/652aab00-af52-421e-993d-1d614b6c3a99/d2734c2a-0ef9-4ece-a130-c4f048361ca6.png",
-    "brickImage": "https://images.koji-cdn.com/652aab00-af52-421e-993d-1d614b6c3a99/brick.png"
+    "backgroundImage": "https://i.imgur.com/pfsIer1.png",
+    "ballImage": "https://i.imgur.com/2311EpG.png",
+    "paddleImage": "https://i.imgur.com/ObIQ6qF.png",
+    "brickImage": "https://i.imgur.com/XCPrzCI.png"
   },
   "@@editor": [
     {

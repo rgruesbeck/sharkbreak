@@ -71,7 +71,7 @@ var y = canvas.height - 30;
 var dx = 0.005 * canvas.width;
 var dy = -0.005 * canvas.height;
 var speed = parseInt(config.settings.ballSpeed);
-var paddleHeight = 10 * gameScale;
+var paddleHeight = 7 * gameScale;
 var paddleWidth = 30 * gameScale;
 var paddleX = (canvas.width - paddleWidth) / 2;
 var paddleXprev = 0;
@@ -145,7 +145,7 @@ function load() {
     loadSound('gameoverSound', config.sounds.gameoverSound),
     loadSound('scoreSound', config.sounds.scoreSound),
     loadSound('dieSound', config.sounds.dieSound),
-    loadFont(config.settings.fontFamily)
+    loadFont('gameFont', config.settings.fontFamily)
   ]).then((assets) => {
     assets.forEach(({ type, key, value}) => {
 
@@ -219,10 +219,10 @@ function play() {
     // move paddle
     if (input.right && paddleX < canvas.width - paddleWidth) {
       paddleXprev = paddleX;
-      paddleX += paddleDx;
+      paddleX += paddleDx / (canvas.width * 0.003);
     } else if (input.left && paddleX > 0) {
       paddleXprev = paddleX;
-      paddleX -= paddleDx;
+      paddleX -= paddleDx / (canvas.width * 0.003);
     }
 
     x += dx * state.ballSpeed;
@@ -232,7 +232,7 @@ function play() {
 
   // game win
   if (state.current === 'win') {
-      overlay.setBanner("You Win!");
+      overlay.setBanner(config.settings.winText);
       playSound(sounds.winSound);
 
       cancelAnimationFrame(frame.count - 1);
@@ -240,7 +240,7 @@ function play() {
 
   // game over
   if (state.current === 'over') {
-      overlay.setBanner("Game Over");
+      overlay.setBanner(config.settings.gameoverText);
       playSound(sounds.gameoverSound);
 
       cancelAnimationFrame(frame.count - 1);
@@ -310,10 +310,10 @@ function checkWallCollisions() {
   let cx = x + ballRadius;
   let cy = y + ballRadius;
 
-  if (cx + dx >= canvas.width - ballRadius || cx + dx <= ballRadius) {
+  if (cx + dx > canvas.width - ballRadius || cx + dx < ballRadius) {
     dx = -dx;
   }
-  if (cy + dy <= ballRadius) {
+  if (cy + dy < ballRadius) {
     dy = -dy;
   }
 }
@@ -322,12 +322,13 @@ function checkPaddleCollisions() {
   let cx = x + ballRadius;
   let cy = y + ballRadius;
   let pv = (paddleX - paddleXprev)/10;
+  console.log(cy, ballRadius);
 
   // check for paddle
-  if (cy + dy >= canvas.height - paddleHeight) {
+  if (cy + dy > canvas.height - paddleHeight - ballRadius) {
     if (cx > paddleX && cx < paddleX + paddleWidth) {
       dx = dx + pv;
-      dy = -dy;
+      dy = Math.abs(dy) * -1;
     }
   }
 
@@ -415,6 +416,10 @@ function handleKeys(type, code) {
     if (code === 'ArrowLeft') {
       input.left = false;
     }
+
+    if (state.current === 'ready') {
+      setState({ current: 'play' });
+    }
   }
 }
 
@@ -443,10 +448,6 @@ function playSound(sound) {
   } else {
     sound.pause();
   }
-}
-
-function sizeCanvas() {
-
 }
 
 function reset() {
