@@ -1,49 +1,37 @@
 # Brick Breaker
-![Game Icons](https://i.imgur.com/b1vP9rA.png)
-A game based on the arcade classic Brick Breaker. A perfect beginner template for new game makers. Jump right into the "index.js" file and begin editing your game settings.
-## Features: 
-- Game ready for release.
-- Works on all platforms, PC, Mac, iOS, Android, etc 
-- Supports multiple resolutions and aspect ratios, automatically. 
-- Supports mouse and touch controls. 
-- Includes Google Analytics support. 
-## Visual Customizations Controls (VCC's) include:
-### Colors
-  * Text Color
-  * Primary Color
-  * Background Color
-  * Font family
-### Game Settings
-  * Start Button Text
-  * Ball Speed
-  * Number of Lives
-  * Rows of Bricks
-### Images
-  * Background Image
-  * Ball Image
-  * Paddle Image
-  * Brick Image
-### Metadata
-  * App Name
-  * Description
-  * GA Tracking ID
-  * Share Image
-  * Icon
-### Sounds
-  * Background Music
-  * Win Sound
-  * Game Over Sound
-  * Score Sound
-  * Die Sound
-## Possibilities for Extension
-1. Levels
-2. Powerups
-  * Super ball – The ball will not be stopped by the wall
-  * Capsule enlarge – This makes the player’s capsule bigger
-  * Magnetized capsule – Will block the ball when hits the capsule
-  * Capsule shrink – The capsule will be smaller
-  * Ball slowdown
-  * Capsule movement inversion – It will make the game harder to play
-3. Different types of blocks
-4. Intelligent physics - Automatic correction of the ball’s direction to avoid that the ball bounces too long with narrow angles.
-Collapse
+
+The breakout clone.
+
+# VCC's
+
+- 🎮 Change the text and game settings.
+    * [Open configuration](#~/.koji/customization/settings.json!visual)
+- 🖼️ Replace the paddle, ball, bricks, and background.
+    * [Open configuration](#~/.koji/customization/images.json!visual)
+- 🔈 Change the sounds and background music.
+    * [Open configuration](#~/.koji/customization/sounds.json!visual)
+- 💅 Change the colors and visual style.
+    * [Open configuration](#~/.koji/customization/colors.json!visual)
+- ⚙️ Add your Google Analytics ID and Open Graph information for sharing.
+    * [Open configuration](#~/.koji/customization/metadata.json!visual)
+
+## Structure
+### ~/
+This is the main directory
+- [index.html](#~/index.html) is the main html file where the game canvas, and overlay elements are declared.
+- [index.js](#~/index.js) is the main javascript file where the load, create, and play loop methods are including code for initializing and loading the game.
+- [style.css](#~/style.css) this file contains css styles for the game canvas, and overlay elements.
+
+### ~/helpers
+This directory contains the main game code.
+- [helpers/overlay.js](#~/helpers/overlay.js)controls the html overlay for displaying game text.
+- [helpers/animationframe.js](#~/helpers/animationframe.js) a shim for requestAnimationFrame, the browsers method for asking for a new frame. Browsers request around 60 frames per second depending of resources.
+- [helpers/loaders.js](#~/helpers/loaders.js) a collections of functions to help load image, sound, and font assets.
+
+## Support
+### Community
+If you need any help, you can ask the community by [making a post](https://gokoji.com/posts), or [joining the discord](https://discordapp.com/invite/eQuMJF6).
+
+### Helpful Resources
+- [Mozilla Game Development Docs](https://developer.mozilla.org/en-US/docs/Games).
+- [HTML5 Game Devs Forum](http://www.html5gamedevs.com/).
