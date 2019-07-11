@@ -3,12 +3,27 @@ import Koji from 'koji-tools';
 Koji.pageLoad();
 const config = Koji.config;
 
-import { requestAnimationFrame, cancelAnimationFrame } from './helpers/animationframe.js';
-import { loadImage, loadSound, loadFont } from './helpers/loaders.js';
+import {
+  hashCode
+} from './helpers/utils.js';
+import {
+  requestAnimationFrame,
+  cancelAnimationFrame
+} from './helpers/animationframe.js';
+import {
+  loadList,
+  loadImage,
+  loadSound,
+  loadFont
+} from 'game-asset-loader';
 import Overlay from './helpers/overlay.js';
 
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
+
+import audioContext from 'audio-context';
+import audioPlayback from 'audio-play';
+import unlockAudioContext from 'unlock-audio-context';
 
 // get new width and height
 var maxWidth = parseInt(config.settings.maxWidth);
@@ -22,13 +37,25 @@ canvas.height = newHeight;
 // center the canvas and set new width on overlay
 canvas.style.marginLeft = `${(window.innerWidth - newWidth)/2}px`;
 
+var audioCtx = audioContext(); // create new audio context
+unlockAudioContext(audioCtx);
+var playlist = [];
+
 // setup overlay
 var overlayNode = document.getElementById("overlay");
-var overlay = new Overlay(overlayNode, {...config.colors, ...config.settings});
+var overlay = new Overlay(overlayNode, {
+  ...config.colors,
+  ...config.settings
+});
 overlay.container.style.maxWidth = `${newWidth}px`;
 
+var prefix = hashCode(config.settings.name); // set prefix for local-storage keys
+
 // setup input and screen
-var input = { right: false, left: false };
+var input = {
+  right: false,
+  left: false
+};
 var gameScale = ((canvas.width + canvas.height) / 270);
 var screen = {
   top: 0,
@@ -46,7 +73,7 @@ var frame = {
 var state = {
   current: 'loading',
   prev: '',
-  muted: localStorage.getItem('brickbreaker-muted') === 'true',
+  muted: localStorage.getItem(prefix.concat('muted')) === 'true',
   score: 0,
   lives: parseInt(config.settings.lives),
   ballSpeed: parseInt(config.settings.ballSpeed)
@@ -55,7 +82,9 @@ var state = {
 function setState(newState) {
   state = {
     ...state,
-    ...{ prev: state.current },
+    ...{
+      prev: state.current
+    },
     ...newState
   };
 }
@@ -107,9 +136,15 @@ function start() {
   }
 
   // register event handlers
-  document.addEventListener("click", ({ target }) => clickHandler(target));
-  document.addEventListener('keydown', ({ code }) => handleKeys('keydown', code));
-  document.addEventListener('keyup', ({ code }) => handleKeys('keyup', code));
+  document.addEventListener("click", ({
+    target
+  }) => clickHandler(target));
+  document.addEventListener('keydown', ({
+    code
+  }) => handleKeys('keydown', code));
+  document.addEventListener('keyup', ({
+    code
+  }) => handleKeys('keyup', code));
 
   document.addEventListener("mousemove", mouseMoveHandler);
   document.addEventListener("touchmove", touchMoveHandler);
@@ -132,47 +167,42 @@ function start() {
 }
 
 function load() {
-  setState({ current: 'loading' });
+  setState({
+    current: 'loading'
+  });
 
   // load assets
-  Promise.all([
-    loadImage('backgroundImage', config.images.backgroundImage),
-    loadImage('ballImage', config.images.ballImage),
-    loadImage('paddleImage', config.images.paddleImage),
-    loadImage('brickImage', config.images.brickImage),
-    loadSound('backgroundMusic', config.sounds.backgroundMusic),
-    loadSound('winSound', config.sounds.winSound),
-    loadSound('gameoverSound', config.sounds.gameoverSound),
-    loadSound('scoreSound', config.sounds.scoreSound),
-    loadSound('dieSound', config.sounds.dieSound),
-    loadFont('gameFont', config.settings.fontFamily)
-  ]).then((assets) => {
-    assets.forEach(({ type, key, value}) => {
+  loadList([
+      loadImage('backgroundImage', config.images.backgroundImage),
+      loadImage('ballImage', config.images.ballImage),
+      loadImage('paddleImage', config.images.paddleImage),
+      loadImage('brickImage', config.images.brickImage),
+      loadSound('backgroundMusic', config.sounds.backgroundMusic),
+      loadSound('winSound', config.sounds.winSound),
+      loadSound('gameoverSound', config.sounds.gameoverSound),
+      loadSound('scoreSound', config.sounds.scoreSound),
+      loadSound('dieSound', config.sounds.dieSound),
+      loadFont('gameFont', config.settings.fontFamily)
+    ], (progress) => {
+      document.getElementById('loading-progress').textContent = `${progress.percent}%`;
+    })
+    .then((assets) => {
 
-      // set images
-      if (type === 'image') {
-        images[key] = value;
-      }
+      images = assets.image;
+      sounds = assets.sound;
+      fonts = assets.font;
 
-      // set sounds
-      if (type === 'sound') {
-        sounds[key] = value;
-      }
-
-      // set font
-      if (type === 'font') {
-        fonts[key] = value;
-      }
-
-    });
-
-    overlay.hideLoading();
-    canvas.style.opacity = 1;
+      overlay.hideLoading();
+      canvas.style.opacity = 1;
 
 
-    setState({ current: 'ready' });
-    play();
-  });
+      setState({
+        current: 'ready'
+      });
+      play();
+    })
+    .catch(err => console.error(err));
+
 }
 
 function play() {
@@ -186,9 +216,8 @@ function play() {
   drawBricks();
   drawPaddle();
 
-  if (state.current === 'ready') {
-    sounds.backgroundMusic.loop = true;
-    playSound(sounds.backgroundMusic);
+  if (state.current === 'ready' && state.prev === 'loading') {
+    playBackgroundMusic();
 
     x = canvas.width / 2;
     y = canvas.height - paddleHeight - ballRadius - 30;
@@ -200,7 +229,10 @@ function play() {
       desktop: config.settings.instructionsDesktop,
       mobile: config.settings.instructionsMobile
     });
+
     overlay.showStats();
+
+    setState({ current: 'ready' })
   }
 
   if (state.current === 'play') {
@@ -232,21 +264,21 @@ function play() {
 
   // game win
   if (state.current === 'win') {
-      overlay.setBanner(config.settings.winText);
-      playSound(sounds.winSound);
+    overlay.setBanner(config.settings.winText);
+    playSound('winSound', sounds.winSound);
 
-      cancelAnimationFrame(frame.count - 1);
+    cancelAnimationFrame(frame.count - 1);
   }
 
   // game over
   if (state.current === 'over') {
-      overlay.setBanner(config.settings.gameoverText);
-      playSound(sounds.gameoverSound);
+    overlay.setBanner(config.settings.gameoverText);
+    playSound('gameoverSound', sounds.gameoverSound);
 
-      cancelAnimationFrame(frame.count - 1);
+    cancelAnimationFrame(frame.count - 1);
   }
 
-  if (['play', 'ready' ].includes(state.current)) {
+  if (['play', 'ready'].includes(state.current)) {
 
     // get new animation frame from browser
     frame.count = requestAnimationFrame(play);
@@ -290,10 +322,10 @@ function restart() {
 
 function clickHandler(target) {
   if (target.id === 'button') {
-    // double mute gets around ios mobile sound restrictions
-    mute(); mute();
 
-    setState({ current: 'play' });
+    setState({
+      current: 'play'
+    });
   }
 
   if (target.id === 'mute') {
@@ -310,9 +342,10 @@ function checkWallCollisions() {
   let cx = x + ballRadius;
   let cy = y + ballRadius;
 
-  if (cx + dx > canvas.width - ballRadius || cx + dx < ballRadius) {
+  if (cx + dx >= canvas.width - ballRadius || cx + dx <= ballRadius) {
     dx = -dx;
   }
+
   if (cy + dy < ballRadius) {
     dy = -dy;
   }
@@ -321,7 +354,7 @@ function checkWallCollisions() {
 function checkPaddleCollisions() {
   let cx = x + ballRadius;
   let cy = y + ballRadius;
-  let pv = (paddleX - paddleXprev)/10;
+  let pv = (paddleX - paddleXprev) / 10;
   console.log(cy, ballRadius);
 
   // check for paddle
@@ -334,15 +367,18 @@ function checkPaddleCollisions() {
 
   // check for splash
   if (cy + dy >= canvas.height + ballRadius) {
-      setState({ lives: state.lives - 1 });
+    setState({
+      lives: state.lives - 1
+    });
 
-      playSound(sounds.dieSound);
-      if (!state.lives) {
-        setState({ current: 'over' });
-      }
-      else {
-        restart();
-      }
+    playSound('dieSound', sounds.dieSound);
+    if (!state.lives) {
+      setState({
+        current: 'over'
+      });
+    } else {
+      restart();
+    }
   }
 }
 
@@ -357,10 +393,14 @@ function checkBrickCollisions() {
         if (cx > b.x && cx < b.x + brickWidth && cy > b.y && cy < b.y + brickHeight) {
           dy = -dy;
           b.status = 0;
-          setState({ score: state.score + 1 });
-          playSound(sounds.scoreSound);
+          setState({
+            score: state.score + 1
+          });
+          playSound('scoreSound', sounds.scoreSound);
           if (state.score == brickRowCount * brickColumnCount) {
-            setState({ current: 'win' });
+            setState({
+              current: 'win'
+            });
           }
         }
       }
@@ -369,28 +409,21 @@ function checkBrickCollisions() {
 }
 
 function mute() {
-  // toggle muted
-  let key = 'brickbreaker-muted';
+  let key = prefix.concat('muted');
   localStorage.setItem(
     key,
     localStorage.getItem(key) === 'true' ? 'false' : 'true'
   );
+
   state.muted = localStorage.getItem(key) === 'true';
-  overlay.setMute(state.muted); // update mute display
+
+  overlay.setMute(state.muted);
 
   if (state.muted) {
-      // mute all game sounds
-      Object.keys(sounds).forEach((key) => {
-          sounds[key].muted = true;
-          sounds[key].pause();
-      });
+    audioCtx.suspend();
   } else {
-      // unmute all game sounds
-      // and play background music
-      Object.keys(sounds).forEach((key) => {
-          sounds[key].muted = false;
-          sounds.backgroundMusic.play();
-      });
+    audioCtx.resume();
+    playBackgroundMusic();
   }
 }
 
@@ -418,7 +451,9 @@ function handleKeys(type, code) {
     }
 
     if (state.current === 'ready') {
-      setState({ current: 'play' });
+      setState({
+        current: 'play'
+      });
     }
   }
 }
@@ -439,21 +474,44 @@ function touchMoveHandler(e) {
   }
 }
 
-function playSound(sound) {
-  if (!sound) { return; }
+function playSound(key, audioBuffer, options = {}) {
+  if (state.muted) {
+    return;
+  }
+  let id = Math.random().toString(16).slice(2);
+  playlist.push({
+    id: id,
+    key: key,
+    playback: audioPlayback(audioBuffer, {
+      ...{
+        start: 0,
+        end: audioBuffer.duration,
+        context: audioCtx
+      },
+      ...options
+    }, () => {
+      // remove played sound from playlist
+      playlist = playlist
+        .filter(s => s.id != id);
+    })
+  });
+}
 
-  sound.currentTime = 0;
-  if (!state.muted) { 
-    sound.play();
-  } else {
-    sound.pause();
+function playBackgroundMusic() {
+  if (!state.muted && !state.backgroundMusic) {
+    let sound = sounds.backgroundMusic;
+    state.backgroundMusic = audioPlayback(sound, {
+      start: 0,
+      end: sound.duration,
+      loop: true,
+      context: audioCtx
+    });
   }
 }
 
 function reset() {
   document.location.reload();
 }
-
 
 // set background color
 document.body.style.backgroundColor = config.colors.backgroundColor;

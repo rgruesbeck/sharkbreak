@@ -26,7 +26,7 @@ This is the main directory
 This directory contains the main game code.
 - [helpers/overlay.js](#~/helpers/overlay.js) controls the html overlay for displaying game text.
 - [helpers/animationframe.js](#~/helpers/animationframe.js) a shim for requestAnimationFrame, the browsers method for asking for a new frame. Browsers request around 60 frames per second depending of resources.
-- [helpers/loaders.js](#~/helpers/loaders.js) a collections of functions to help load image, sound, and font assets.
+- [helpers/utils.js](#~/helpers/utils.js) utility function.
 
 ## Support
 ### Community
